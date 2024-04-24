@@ -13,6 +13,13 @@ In code this query reflects:
 - **limit** - `$builder->limit(10)`
 - **offset** - `$builder->offset(20)`
 
+## Installation
+Requires laravel >= 9 and php ^8.1
+
+```bash
+composer require freebuu/laravel-filterable
+```
+
 ## Basic usage (pagination only)
 Add [HasRequestFilter](src/HasRequestFilter.php) trait to Model - that's all.
 ```php
