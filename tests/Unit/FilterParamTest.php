@@ -55,7 +55,6 @@ class FilterParamTest extends TestCase
         $builder
             ->shouldReceive($method)
             ->withArgs(array_values(array_filter([$filter->field, $operator, $filter->normalizedValue()])));
-        dump(array_filter([$filter->field, $operator, $filter->normalizedValue()]));
         $filter->apply($builder);
         $this->addToAssertionCount(1);
     }
