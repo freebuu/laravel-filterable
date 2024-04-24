@@ -160,7 +160,3 @@ Post::requestFilter()
     ->addQueryCallback(fn (Builder $builder) => $builder->where('author_id', auth()->id()))
     ->response(ResourceClass::class);
 ```
-## Configuration
-### Default limit (max limit)
-For security purposes, sets the maximum value that the field can accept
-- To spec
