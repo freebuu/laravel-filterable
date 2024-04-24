@@ -99,7 +99,7 @@ abstract class AbstractFilter implements Arrayable
             $filter->apply($builder);
         }
     }
-    abstract protected function getFieldsForFilter(FilterCaseEnum $filter): array;
+    abstract protected function getFilterableFields(FilterCaseEnum $case): array;
 
     protected function prepareQueryForFiltering(Builder $builder): void
     {
@@ -149,7 +149,7 @@ abstract class AbstractFilter implements Arrayable
 
     private function isFilterSuitable(FilterParam $filterParam): bool
     {
-        $fields = $this->getFieldsForFilter($filterParam->case);
+        $fields = $this->getFilterableFields($filterParam->case);
 
         if ($filterParam->case === FilterCaseEnum::FILTER) {
             return true;
