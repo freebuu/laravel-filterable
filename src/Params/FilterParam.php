@@ -42,14 +42,14 @@ final class FilterParam
             }
             return $this->value . '%';
         }
-        if($this->case === FilterCaseEnum::TO || $this->case === FilterCaseEnum::FROM){
-            if(! is_numeric($this->value)){
+        if($this->case === FilterCaseEnum::TO || $this->case === FilterCaseEnum::FROM) {
+            if(! is_numeric($this->value)) {
                 return null;
             }
             return $this->value;
         }
         if($this->case === FilterCaseEnum::SORT) {
-            if(! in_array($this->value, ['desc', 'asc'])){
+            if(! in_array($this->value, ['desc', 'asc'])) {
                 return null;
             }
             return $this->value;
