@@ -22,35 +22,25 @@ abstract class AbstractFilter implements Arrayable
     public static int $defaultMaxLimit = 30;
     protected ?int $maxLimit = null;
 
-    protected Builder $builder;
-    protected Request $request;
     /** @var callable[]  */
     private array $queryCallbacks = [];
     /** @var FilterParam[]  */
     private array $filters = [];
 
-    final public function __construct(Request $request)
-    {
-        $this->setRequest($request);
+    private function __construct(
+        protected readonly Builder $builder,
+        protected readonly Request $request
+    ) {
     }
 
-    final public function setBuilder(Builder $builder): static
+    public static function create(Builder $builder, Request $request): static
     {
-        $this->builder = $builder;
-
-        return $this;
-    }
-
-    final public function setRequest(Request $request): static
-    {
-        $this->request = $request;
-        $this->parseFilters();
-
-        return $this;
+        return new static($builder, $request);
     }
 
     final public function apply(Builder $builder): void
     {
+        $this->parseFilters();
         $this->prepareQueryForFiltering($builder);
         $this->applyFilters($builder);
         $this->applyQueryCallback($builder);

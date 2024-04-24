@@ -4,7 +4,6 @@ namespace FreeBuu\LaravelFilterable;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 
 /** @mixin Model */
 trait HasRequestFilter
@@ -17,13 +16,8 @@ trait HasRequestFilter
     public static function requestFilter(Request $request = null): AbstractFilter
     {
         $model = new self();
-        $query = $model->newQuery();
         /** @var AbstractFilter $filter */
-        $filter = App::make($model->requestFilterClass());
-        $filter->setBuilder($query);
-        if ($request) {
-            $filter->setRequest($request);
-        }
-        return $filter;
+        $filter = $model->requestFilterClass();
+        return $filter::create($model->newQuery(), $request);
     }
 }
