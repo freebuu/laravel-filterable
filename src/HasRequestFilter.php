@@ -18,6 +18,6 @@ trait HasRequestFilter
         $model = new self();
         /** @var AbstractFilter $filter */
         $filter = $model->requestFilterClass();
-        return $filter::create($model->newQuery(), $request);
+        return $filter::create($model->newQuery(), $request ?? request());
     }
 }

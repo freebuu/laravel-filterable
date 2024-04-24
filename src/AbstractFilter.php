@@ -63,7 +63,7 @@ abstract class AbstractFilter implements Arrayable
                 continue;
             }
             if ($case === FilterCaseEnum::FILTER) {
-                if (!method_exists($this, $method = Str::camel($field) . 'Filter')) {
+                if (!method_exists($this, $method = 'filter' . Str::studly($field))) {
                     continue;
                 }
                 $field = $this->$method(...);
