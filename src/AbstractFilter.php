@@ -27,7 +27,7 @@ abstract class AbstractFilter implements Arrayable
     /** @var FilterParam[]  */
     private array $filters = [];
 
-    private function __construct(
+    final private function __construct(
         protected readonly Builder $builder,
         protected readonly Request $request
     ) {
