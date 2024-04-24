@@ -23,6 +23,9 @@
     "illuminate/database": "^9.0 | ^10.0 | ^11.0",
     "illuminate/http": "^9.0 | ^10.0 | ^11.0"
   },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.54"
+  },
   "autoload": {
     "psr-4": {
       "FreeBuu\\LaravelFilterable\\": "src"
