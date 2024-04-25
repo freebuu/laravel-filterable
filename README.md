@@ -6,12 +6,12 @@ Example query:
 ?search_description=some%20text&sort_id=desc&where_publisher_id=1,23&where_has_groups__id=30,40&limit=10&offset=20
 ```
 In code this query reflects:
-- **search_description** - `$builder->where('description', 'like', '%some%text%')`
-- **sort_id** - `$builder->sortBy('id', 'desc')`
-- **where_publisher_id** - `$builder->whereIn('publisher_id', [1,23])`
-- **where_has_groups__id** - `$builder->whereHas('groups', fn($builder) => $builder->whereIn('id', [30,40]))`
-- **limit** - `$builder->limit(10)`
-- **offset** - `$builder->offset(20)`
+- **search_description=some%20text** - `$builder->where('description', 'like', '%some%text%')`
+- **sort_id=desc** - `$builder->sortBy('id', 'desc')`
+- **where_publisher_id=1,23** - `$builder->whereIn('publisher_id', [1,23])`
+- **where_has_groups__id=30,40** - `$builder->whereHas('groups', fn($builder) => $builder->whereIn('id', [30,40]))`
+- **limit=10** - `$builder->limit(10)`
+- **offset=20** - `$builder->offset(20)`
 
 ## Installation
 Requires laravel >= 9 and php ^8.1
@@ -32,19 +32,15 @@ class PostIndexController
     }
 }
 ```
-You have:
-- `limit` query param - limit the query
-- `offset` query params - sets query offset
-- `meta` json key with pagination data
-- `data` json key with posts, wrapped in `PostResource` (of course you can not set resource and simply output collection)
-```json
+Example result for query `/api/posts/?limit=25&offset=10`
+```json lines
 {
-    "meta": {
+    "meta": { // object with pagination data
         "limit": 25,
-        "offset": 0,
-        "total": 1
+        "offset": 10,
+        "total": 2
     },
-    "data": [
+    "data": [ //array with model data, wrapped in `PostResource` (of course you can not use resource and simply output collection or pass collection to view)
         {
             "id": "1",
             "title": "post title"
@@ -96,7 +92,7 @@ Filterable query params contains four parts separated with `_`. Let's see exampl
 - **$fieldValue** - id (optional, mandatory only with **where_has**)
 - **$value** - 30,40
 
-In code they are presented as [FilterCaseEnum.php](src/Params/FilterCaseEnum.php) and they work like this
+In code, they are presented as [FilterCaseEnum.php](src/Params/FilterCaseEnum.php) and they work like this
 - **FROM** 
   - Accepts only int
   - `$builder->where($field, '>=', $value)`
@@ -124,7 +120,7 @@ In code they are presented as [FilterCaseEnum.php](src/Params/FilterCaseEnum.php
 ### Custom filters
 In filter class you can make custom filter by creating a method like `filterCustom` - it **must** begin with `filter`. Then yoy can use it in query like `?filter_custom=123`
 
-_**HINT**_ - you can use `fieldValue` here like `?filter_custom__alias=123`
+_**HINT**_ - you can use `fieldValue` here like `?filter_custom__alias=123` - it pass as third parameter in filter method.
 ```php
 class PostFilter extends AbstractFilter
 {

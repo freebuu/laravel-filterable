@@ -47,7 +47,7 @@ abstract class AbstractFilter implements Arrayable
         $this->finalize($builder);
     }
 
-    final public function finalize(Builder $builder): void
+    private function finalize(Builder $builder): void
     {
         $builder
             ->offset($this->request->input(self::PARAM_OFFSET, 0))
@@ -107,7 +107,7 @@ abstract class AbstractFilter implements Arrayable
 
     private function getLimit(): int
     {
-        $maxLimit = $this->maxLimit ?? static::$defaultMaxLimit ;
+        $maxLimit = $this->maxLimit ?? static::$defaultMaxLimit;
 
         return $this->request->input(self::PARAM_LIMIT, 0) > $maxLimit
             ? $maxLimit
