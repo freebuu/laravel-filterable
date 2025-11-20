@@ -1,7 +1,7 @@
 {
   "name": "freebuu/laravel-filterable",
   "type": "package",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Model filters for your index requests",
   "keywords": [
     "laravel",
