@@ -8,16 +8,15 @@ use Illuminate\Http\Request;
 /** @mixin Model */
 trait HasRequestFilter
 {
-    protected function requestFilterClass(): string
-    {
-        return BasicFilter::class;
-    }
-
-    public static function requestFilter(Request $request = null): AbstractFilter
+    final public static function requestFilter(?Request $request = null): AbstractFilter
     {
         $model = new self();
-        /** @var AbstractFilter $filter */
-        $filter = $model->requestFilterClass();
-        return $filter::create($model->newQuery(), $request ?? request());
+        /** @phpstan-ignore function.alreadyNarrowedType, function.impossibleType */
+        $filterClass = property_exists($model, 'requestFilter') ? $model->requestFilter : BasicFilter::class;
+        if (!is_a($filterClass, AbstractFilter::class, true)) {
+            throw new \InvalidArgumentException(sprintf('Class %s must extend %s', $filterClass, AbstractFilter::class));
+        }
+
+        return $filterClass::create($model->newQuery(), $request ?? request());
     }
 }

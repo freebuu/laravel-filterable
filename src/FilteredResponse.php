@@ -29,17 +29,29 @@ final class FilteredResponse implements Arrayable
             'meta' => [
                 'limit' => $this->builder->getQuery()->limit,
                 'offset' => $this->builder->getQuery()->offset,
-                'total' => $this->builder->getQuery()->getCountForPagination(),
+                'total' => $this->getCountForPagination($this->builder),
             ],
             'data' => $this->transformData($this->builder->get()),
         ];
+    }
+
+    private function getCountForPagination(Builder $builder): int
+    {
+        return $builder->clone()->tap(function ($eloquentBuilder) {
+            $eloquentBuilder->getQuery()->tap(function ($queryBuilder) {
+                $queryBuilder->limit = null;
+                $queryBuilder->offset = null;
+                $queryBuilder->orders = null;
+                $queryBuilder->unions = null;
+            });
+        })->count();
     }
 
     private function transformData(Collection $data): mixed
     {
         if (is_callable($this->resource)) {
             $data = call_user_func_array($this->resource, [$data]);
-        } elseif (method_exists($this->resource, 'collection')) {
+        } elseif (!is_null($this->resource) && method_exists($this->resource, 'collection')) {
             $data = $this->resource::collection($data);
         }
 
