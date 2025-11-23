@@ -10,8 +10,12 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         php: [8.1, 8.2, 8.3]
+        laravel: [12.*]
+        include:
+          -   laravel: 12.*
+              testbench: 10.*
 
-    name: P${{ matrix.php }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.os }}
 
     steps:
       -   name: Checkout code
@@ -26,7 +30,8 @@ jobs:
 
       -   name: Install dependencies
           run: |
-            composer install --prefer-dist --no-interaction
+            composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction
+            composer install --${{ matrix.stability }} --prefer-dist --no-interaction
 
       -   name: Execute phpstan
           run: vendor/bin/phpstan analyse
