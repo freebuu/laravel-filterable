@@ -12,7 +12,7 @@ trait HasRequestFilter
     {
         $model = new self();
         /** @phpstan-ignore function.alreadyNarrowedType, function.impossibleType */
-        $filterClass = property_exists($model, 'requestFilter') ? $model->requestFilter : BasicFilter::class;
+        $filterClass ??= property_exists($model, 'requestFilter') ? $model->requestFilter : BasicFilter::class;
         if (!is_a($filterClass, AbstractFilter::class, true)) {
             throw new \InvalidArgumentException(sprintf('Class %s must extend %s', $filterClass, AbstractFilter::class));
         }
