@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 /** @mixin Model */
 trait HasRequestFilter
 {
-    final public static function requestFilter(?Request $request = null): AbstractFilter
+    final public static function requestFilter(?Request $request = null, ?string $filterClass = null): AbstractFilter
     {
         $model = new self();
         /** @phpstan-ignore function.alreadyNarrowedType, function.impossibleType */
