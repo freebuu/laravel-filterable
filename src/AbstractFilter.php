@@ -75,6 +75,7 @@ abstract class AbstractFilter implements Arrayable
     {
         $builder
             ->offset($this->request->input(self::PARAM_OFFSET, 0))
+            /** @phpstan-ignore-next-line */
             ->when($this->getLimit() > 0, fn (Builder $builder) => $builder->limit($this->getLimit()));
     }
 
