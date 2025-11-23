@@ -5,11 +5,12 @@ namespace Tests\Unit;
 use FreeBuu\LaravelFilterable\Params\FilterCaseEnum;
 use FreeBuu\LaravelFilterable\Params\FilterParam;
 use Illuminate\Database\Eloquent\Builder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class FilterParamTest extends TestCase
 {
-    public function provideTestNormalizeValues(): array
+    public static function provideTestNormalizeValues(): array
     {
         return [
             [FilterCaseEnum::WHERE, null, null],
@@ -28,14 +29,14 @@ class FilterParamTest extends TestCase
         ];
     }
 
-    /** @dataProvider provideTestNormalizeValues */
+    #[DataProvider('provideTestNormalizeValues')]
     public function testNormalizeValues(FilterCaseEnum $case, mixed $value, mixed $expected): void
     {
         $filter = new FilterParam($case, 'some-field', $value);
         $this->assertEquals($expected, $filter->normalizedValue());
     }
 
-    public function provideTestApply(): array
+    public static function provideTestApply(): array
     {
         return [
             [FilterCaseEnum::FROM, 'where', '>='],
@@ -47,7 +48,7 @@ class FilterParamTest extends TestCase
         ];
     }
 
-    /** @dataProvider provideTestApply */
+    #[DataProvider('provideTestApply')]
     public function testApply(FilterCaseEnum $case, string $method, string $operator = null)
     {
         $filter = new FilterParam($case, 'some-field', 'some_value');
