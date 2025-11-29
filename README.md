@@ -25,22 +25,21 @@ Add [HasRequestFilter](src/HasRequestFilter.php) trait to Model - that's all.
 ```php
 class PostIndexController
 {
-    public function __invoke(Request $request) 
+    public function __invoke(Request $request): JsonResponse
     {
-        $data = Post::requestFilter()->setResource(PostResource::class);
-        return response()->json($data);
+        return Post::requestFilter()->jsonResponse(PostResource::class)
     }
 }
 ```
 Example result for query `/api/posts/?limit=25&offset=10`
 ```json lines
 {
-    "meta": { // object with pagination data
+    "meta": {
         "limit": 25,
         "offset": 10,
         "total": 2
     },
-    "data": [ //array with model data, wrapped in `PostResource` (of course you can not use resource and simply output collection or pass collection to view)
+    "data": [
         {
             "id": "1",
             "title": "post title"
@@ -52,8 +51,10 @@ Example result for query `/api/posts/?limit=25&offset=10`
     ]
 }
 ```
+- `meta` - object with pagination data
+- `data` - array with model data, wrapped in `PostResource` 
 ## Filtration
-For filtration, you need to create filter class for each model. Filter class must extend [AbstractFilter](src/AbstractFilter.php). Best place for these classes is `App\Http\Filters`.
+For filtration, you need to create a filter class for each model. Filter class must extend [AbstractFilter](src/AbstractFilter.php). Best place for these classes is `App\Http\Filters`.
 
 In method `getFilterableFields()` you specify which fields can be filtered in each filter case.
 
@@ -72,16 +73,13 @@ class PostFilter extends AbstractFilter
     }
 }
 ```
-To set this filter for `Model` - overwrite `requestFilterClass()` method
+To set this filter for `Model` - add property `requestFilter`
 ```php
 class Post extends Model
 {
     use HasRequestFilter;
     
-    public function requestFilterClass(): string
-    {
-        return \App\Http\Filters\PostFilter::class;
-    }
+    protected string $requestFilter = PostFilter::class;
 }
 ```
 
@@ -153,13 +151,16 @@ class AppServiceProvider extends ServiceProvider
 }
 ```
 
-### Resource
-To set up resource - just pass resource class like here `Post::requestFilter()->response(PostResource::class)`.
-
-### Query callbacks 
-Sometimes you need to set up query condition situational - e.g. filter only for auth user
+## Query callbacks 
+Sometimes you need to set up query condition situational—e.g. filter only for auth user
 ```php
 Post::requestFilter()
     ->addQueryCallback(fn (Builder $builder) => $builder->where('author_id', auth()->id()))
+    ->response(ResourceClass::class);
+```
+Or just use `Builder` mixin:
+```php
+Post::requestFilter()
+    ->where('author_id', auth()->id())
     ->response(ResourceClass::class);
 ```
