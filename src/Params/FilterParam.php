@@ -21,7 +21,7 @@ final class FilterParam
     /**
      * @return string|int|array|bool|null
      */
-    private function normalizedValue(): string|int|array|bool|null
+    public function normalizedValue(): string|int|array|bool|null
     {
         if (
             $this->value === 'null'
