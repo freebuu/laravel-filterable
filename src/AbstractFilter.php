@@ -7,6 +7,7 @@ use FreeBuu\LaravelFilterable\Params\FilterCaseEnum;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 /**
@@ -73,9 +74,12 @@ abstract class AbstractFilter implements Arrayable
 
     private function paginate(Builder $builder): void
     {
+        $requestOffset = $this->request->input(self::PARAM_OFFSET, 0);
+        if (!is_numeric($requestOffset)) {
+            $requestOffset = 0;
+        }
         $builder
-            ->offset($this->request->input(self::PARAM_OFFSET, 0))
-            /** @phpstan-ignore-next-line */
+            ->offset($requestOffset)
             ->when($this->getLimit() > 0, fn (Builder $builder) => $builder->limit($this->getLimit()));
     }
 
@@ -97,6 +101,7 @@ abstract class AbstractFilter implements Arrayable
         if (!$query = $this->request->getQueryString()) {
             return;
         }
+        $validation = [];
         foreach ($parseParams($query) as $param => $value) {
             if (![$case, $field, $fieldValue] = $this->parseQueryParam($param)) {
                 continue;
@@ -114,7 +119,13 @@ abstract class AbstractFilter implements Arrayable
             if (!$this->isFilterSuitable($filter)) {
                 continue;
             }
+            if (is_string($field) && $filter->case !== FilterCaseEnum::SORT) {
+                $validation[$field] = $fieldValue ? [$fieldValue => $value] : $value;
+            }
             $this->filters[] = $filter;
+        }
+        if ($rules = $this->validateFilterableValues()) {
+            Validator::validate($validation, $rules);
         }
     }
 
@@ -159,6 +170,11 @@ abstract class AbstractFilter implements Arrayable
     }
     abstract protected function getFilterableFields(FilterCaseEnum $case): array;
 
+    protected function validateFilterableValues(): array
+    {
+        return [];
+    }
+
     protected function prepareQueryForFiltering(Builder $builder): void
     {
     }
@@ -171,6 +187,9 @@ abstract class AbstractFilter implements Arrayable
     {
         $maxLimit = $this->maxLimit;
         $requestLimit = $this->request->input(self::PARAM_LIMIT) ?: $maxLimit;
+        if (!is_numeric($requestLimit)) {
+            return $maxLimit;
+        }
 
         return ($maxLimit > 0 && $requestLimit > $maxLimit) ? $maxLimit : $requestLimit;
     }
@@ -262,5 +281,26 @@ abstract class AbstractFilter implements Arrayable
         } else {
             return array_is_list($fields) && in_array($filterParam->field, $fields);
         }
+    }
+
+    final protected function overrideSearchCommon(Builder $query, string $value): void
+    {
+        if (empty($key = trim($value))) {
+            return;
+        }
+        if (empty($fields = $this->getSearchableFields())) {
+            return;
+        }
+        $key = '%' . str_replace(' ', '%', $key) . '%';
+        $query->where(function ($query) use ($key, $fields) {
+            foreach ($fields as $field) {
+                $query->orWhere($field, FilterParam::$likeFunction, '%' . $key . '%');
+            }
+        });
+    }
+
+    protected function getSearchableFields(): array
+    {
+        return [];
     }
 }
