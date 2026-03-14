@@ -80,7 +80,7 @@ abstract class AbstractFilter implements Arrayable
         }
         $builder
             ->offset($requestOffset)
-            ->when($this->getLimit() > 0, fn (Builder $builder) => $builder->limit($this->getLimit()));
+            ->when($this->getLimit() > 0, fn ($builder) => $builder->limit($this->getLimit()));
     }
 
     private function parseFilters(): void
