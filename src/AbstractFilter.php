@@ -21,7 +21,10 @@ abstract class AbstractFilter implements Arrayable
     protected const FIELD_DELIMITER = '_';
     protected const FIELD_VALUE_DELIMITER = '__';
 
-    protected int $maxLimit = 30;
+    public static int $defaultMaxLimit = 30;
+    public static int $defaultLimit = 30;
+    protected ?int $maxLimit = null;
+    protected ?int $limit = null;
 
     /** @var callable[]  */
     private array $queryCallbacks = [];
@@ -185,10 +188,10 @@ abstract class AbstractFilter implements Arrayable
 
     private function getLimit(): int
     {
-        $maxLimit = $this->maxLimit;
-        $requestLimit = $this->request->input(self::PARAM_LIMIT) ?: $maxLimit;
+        $maxLimit = $this->maxLimit ?? self::$defaultMaxLimit;
+        $requestLimit = $this->request->input(self::PARAM_LIMIT);
         if (!is_numeric($requestLimit)) {
-            return $maxLimit;
+            $requestLimit = $this->limit ?? self::$defaultLimit;
         }
 
         return ($maxLimit > 0 && $requestLimit > $maxLimit) ? $maxLimit : $requestLimit;
