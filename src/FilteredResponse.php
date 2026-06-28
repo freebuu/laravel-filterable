@@ -10,10 +10,18 @@ final class FilteredResponse implements Arrayable
 {
     private Builder $builder;
     private mixed $resource = null;
+    private bool $withCount = true;
 
     public function __construct(Builder $builder)
     {
         $this->builder = $builder;
+    }
+
+    public function setWithCount(bool $withCount): FilteredResponse
+    {
+        $this->withCount = $withCount;
+
+        return $this;
     }
 
     public function setResource(string|callable|null $resource): FilteredResponse
@@ -35,8 +43,11 @@ final class FilteredResponse implements Arrayable
         ];
     }
 
-    private function getCountForPagination(Builder $builder): int
+    private function getCountForPagination(Builder $builder): ?int
     {
+        if(!$this->withCount) {
+            return null;
+        }
         return $builder->clone()->tap(function ($eloquentBuilder) {
             $eloquentBuilder->getQuery()->tap(function ($queryBuilder) {
                 $queryBuilder->limit = null;

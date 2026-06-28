@@ -37,6 +37,8 @@ abstract class AbstractFilter implements Arrayable
     /** @var string[]  */
     private array $excludeScopes = [];
 
+    private bool $withCount = true;
+
     final private function __construct(
         protected readonly Builder $builder,
         protected readonly Request $request
@@ -237,12 +239,20 @@ abstract class AbstractFilter implements Arrayable
         }
     }
 
+    private function withoutCount(): static
+    {
+        $this->withCount = false;
+
+        return $this;
+    }
+
     final public function response(string|callable|null $resource = null): FilteredResponse
     {
         $builder = $this->getBuilder();
         $this->paginate($builder);
         $response = new FilteredResponse($builder);
         $response->setResource($resource);
+        $response->setWithCount($this->withCount);
 
         return $response;
     }
