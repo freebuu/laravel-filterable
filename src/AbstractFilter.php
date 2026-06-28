@@ -239,7 +239,7 @@ abstract class AbstractFilter implements Arrayable
         }
     }
 
-    private function withoutCount(): static
+    public function withoutCount(): static
     {
         $this->withCount = false;
 
